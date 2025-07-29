@@ -1,5 +1,5 @@
 {
-  "name": "family-tree-renderer",
+  "name": "botloaderscripting",
   "version": "1.0.0",
   "scripts": {
     "start": "npx serve .",
