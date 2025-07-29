@@ -169,8 +169,29 @@
               .filter(x => x !== undefined);
         
             if (parentXs.length > 0) {
-              const centerX = parentXs.reduce((a, b) => a + b, 0) / parentXs.length;
-              positions.set(childName, { x: centerX, y: childY });
+              let centerX = parentXs.reduce((a, b) => a + b, 0) / parentXs.length;
+            
+              // Prevent overlap with nearby nodes
+              const usedX = new Set(
+                [...positions.entries()]
+                  .filter(([_, pos]) => pos.y === childY)
+                  .map(([_, pos]) => Math.round(pos.x))
+              );
+            
+              const spacing = nodeSpacing;
+              let adjustedX = Math.round(centerX / spacing) * spacing;
+              let offset = 0;
+              const maxTries = 20;
+            
+              while (usedX.has(adjustedX) && offset < maxTries) {
+                offset++;
+                adjustedX = Math.round((centerX + offset * spacing) / spacing) * spacing;
+                if (!usedX.has(adjustedX)) break;
+            
+                adjustedX = Math.round((centerX - offset * spacing) / spacing) * spacing;
+              }
+            
+              positions.set(childName, { x: adjustedX, y: childY });
             }
           }
         }
