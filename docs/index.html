@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Family Tree</title>
+  <script src="https://unpkg.com/cytoscape@3.26.0/dist/cytoscape.min.js"></script>
+  <style>
+    body, html { margin: 0; padding: 0; }
+    #cy { width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="cy"></div>
+  <script>
+    const getId = name => name.replace(/\s+/g, "_");
+
+    fetch("family.json")
+      .then(res => res.json())
+      .then(rawData => {
+        const nodes = new Set();
+        const edges = [];
+
+        for (const person of rawData) {
+          const id = getId(person.name);
+          nodes.add(id);
+        }
+
+        for (const person of rawData) {
+          const parentId = getId(person.name);
+
+          for (const partner of person.partners) {
+            const partnerId = getId(partner);
+            const edgeId = [parentId, partnerId].sort().join("-");
+            edges.push({
+              group: "edges",
+              data: { id: edgeId, source: parentId, target: partnerId, label: "partner" }
+            });
+          }
+
+          for (const child of person.children) {
+            const childId = getId(child);
+            edges.push({
+              group: "edges",
+              data: { id: parentId + "->" + childId, source: parentId, target: childId, label: "child" }
+            });
+          }
+        }
+
+        const elements = Array.from(nodes).map(id => ({
+          group: "nodes", data: { id }
+        })).concat(edges);
+
+        cytoscape({
+          container: document.getElementById("cy"),
+          elements,
+          style: [
+            {
+              selector: "node",
+              style: {
+                label: "data(id)",
+                "background-color": "#0074D9",
+                color: "#fff",
+                "text-valign": "center",
+                "text-halign": "center",
+                "font-size": "12px",
+                "width": 50,
+                "height": 50
+              }
+            },
+            {
+              selector: "edge",
+              style: {
+                width: 2,
+                "line-color": "#ccc",
+                "target-arrow-shape": "triangle",
+                "target-arrow-color": "#ccc",
+                "curve-style": "bezier"
+              }
+            },
+            {
+              selector: 'edge[label = "partner"]',
+              style: {
+                "target-arrow-shape": "none",
+                "line-style": "dashed",
+                "line-color": "#FF851B"
+              }
+            }
+          ],
+          layout: {
+            name: "breadthfirst",
+            directed: true,
+            spacingFactor: 1.5,
+            roots: rawData.filter(p => p.children.length).map(p => getId(p.name))
+          }
+        });
+      });
+  </script>
+</body>
+</html>
