@@ -75,56 +75,43 @@
         }
   
         const cy = cytoscape({
-          container: document.getElementById("cy"),
-          elements: [...nodes.values(), ...edges],
-          style: [
-            {
-              selector: "node",
-              style: {
-                label: "data(label)",
-                "background-color": "#0074D9",
-                "text-valign": "center",
-                "text-halign": "center",
-                "font-size": "12px",
-                color: "#fff",
-                width: 50,
-                height: 50
-              }
-            },
-            {
-              selector: "node[isPlaceholder = true]",
-              style: {
-                "background-color": "#aaa",
-                "font-style": "italic",
-                "text-opacity": 0.7
-              }
-            },
-            {
-              selector: "edge",
-              style: {
-                width: 2,
-                "line-color": "#ccc",
-                "target-arrow-shape": "triangle",
-                "target-arrow-color": "#ccc",
-                "curve-style": "bezier"
-              }
-            },
-            {
-              selector: 'edge[label = "partner"]',
-              style: {
-                "target-arrow-shape": "none",
-                "line-style": "dashed",
-                "line-color": "#FF851B"
-              }
-            }
-          ],
-          layout: {
-            name: "breadthfirst",
-            directed: true,
-            spacingFactor: 1.5,
-            roots: rawData.filter(p => p.children.length).map(p => getId(p.name))
+      container: document.getElementById("cy"),
+      elements,
+      layout: {name: "breadthfirst"},
+      style: [
+        {
+          selector: "node",
+          style: {
+            "background-color": "#4f91ff",
+            "label": "data(label)",
+            "color": "#fff",
+            "text-valign": "center",
+            "text-halign": "center",
+            "text-outline-color": "#000",
+            "text-outline-width": 2,
+            "font-size": "12px",
+            "width": "label",
+            "height": "label",
+            "padding": "8px"
           }
-        });
+        },
+        {
+          selector: "edge",
+          style: {
+            "width": 2,
+            "line-color": "#aaa",
+            "target-arrow-color": "#aaa",
+            "target-arrow-shape": "triangle",
+            "curve-style": "bezier",
+            "label": "data(label)",
+            "font-size": "10px",
+            "color": "#ccc",
+            "text-rotation": "autorotate",
+            "text-margin-y": -5
+          }
+        }
+      ]
+    });
       });
   </script>
 </body>
