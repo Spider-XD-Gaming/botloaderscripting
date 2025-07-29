@@ -42,6 +42,16 @@
         // === Step 1: Compute generations based on parent → child ===
         const generations = new Map();
         const visited = new Set();
+
+        // Find root people (no one lists them as children)
+        const allNames = Array.from(graph.keys());
+        const allChildren = new Set();
+        for (const [_, data] of graph) {
+          for (const child of data.children) {
+            allChildren.add(child);
+          }
+        }
+        const roots = allNames.filter(n => !allChildren.has(n));
         
         const queue = roots.map(name => ({ name, level: 0 }));
         
