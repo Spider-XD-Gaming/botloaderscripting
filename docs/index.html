@@ -39,56 +39,109 @@
           }
         }
   
-        // Step 1: Assign generations based on parent-child relationships only
+        // === Step 1: Compute generations based on parent → child ===
         const generations = new Map();
         const visited = new Set();
-
-        // Find root people (no one lists them as children)
-        const allNames = Array.from(graph.keys());
-        const allChildren = new Set();
-        for (const [_, data] of graph) {
-          for (const child of data.children) {
-            allChildren.add(child);
-          }
-        }
-        const roots = allNames.filter(n => !allChildren.has(n));
         
         const queue = roots.map(name => ({ name, level: 0 }));
         
         while (queue.length > 0) {
           const { name, level } = queue.shift();
-          if (generations.has(name)) {
-            generations.set(name, Math.min(generations.get(name), level));
-          } else {
+          if (!generations.has(name) || generations.get(name) < level) {
             generations.set(name, level);
-          }
-          visited.add(name);
-        
-          const data = graph.get(name);
-          for (const child of data.children) {
-            if (!generations.has(child)) {
+            const data = graph.get(name);
+            for (const child of data.children) {
               queue.push({ name: child, level: level + 1 });
             }
           }
         }
         
-        // Step 2: Pull partners down to the max of any connected partner
+        // === Step 2: Force partners to the same (max) generation ===
         let changed = true;
         while (changed) {
           changed = false;
           for (const [name, data] of graph.entries()) {
             const level = generations.get(name);
             for (const partner of data.partners) {
-              const partnerLevel = generations.get(partner);
-              if (partnerLevel !== undefined && partnerLevel < level) {
-                generations.set(partner, level);
+              const pLevel = generations.get(partner) ?? level;
+              const maxLevel = Math.max(level, pLevel);
+              if (generations.get(name) !== maxLevel) {
+                generations.set(name, maxLevel);
                 changed = true;
-              } else if (partnerLevel === undefined) {
-                generations.set(partner, level);
+              }
+              if (generations.get(partner) !== maxLevel) {
+                generations.set(partner, maxLevel);
                 changed = true;
               }
             }
           }
+        }
+        
+        // === Step 3: Positioning ===
+        const positions = new Map(); // name → {x, y}
+        const levelHeights = new Map(); // gen → current horizontal offset
+        const nodeSpacing = 100;
+        const levelSpacing = 150;
+        
+        // Helper to group partners together and avoid overlap
+        const layouted = new Set();
+        
+        for (const [name, level] of [...generations.entries()].sort((a, b) => a[1] - b[1])) {
+          if (layouted.has(name)) continue;
+        
+          const y = level * levelSpacing;
+        
+          const data = graph.get(name);
+          const partners = [...data.partners].filter(p => generations.get(p) === level);
+        
+          if (partners.length === 0) {
+            // Single node
+            const x = (levelHeights.get(level) ?? 0) * nodeSpacing;
+            positions.set(name, { x, y });
+            levelHeights.set(level, (levelHeights.get(level) ?? 0) + 1);
+            layouted.add(name);
+          } else {
+            // Layout group of partners together
+            const all = [name, ...partners].sort();
+            const xStart = (levelHeights.get(level) ?? 0) * nodeSpacing;
+            all.forEach((person, i) => {
+              positions.set(person, { x: xStart + i * nodeSpacing, y });
+              layouted.add(person);
+            });
+            levelHeights.set(level, (levelHeights.get(level) ?? 0) + all.length);
+          }
+        }
+        
+        // === Step 4: Position children centered below their parents ===
+        for (const [parentName, data] of graph.entries()) {
+          const parentPos = positions.get(parentName);
+          const parentLevel = generations.get(parentName);
+        
+          for (const childName of data.children) {
+            if (positions.has(childName)) continue; // Already placed (e.g., has multiple parents)
+        
+            // Find all parents of this child
+            const parents = [...graph.entries()]
+              .filter(([_, d]) => d.children.has(childName))
+              .map(([n]) => n);
+            const parentXs = parents.map(p => positions.get(p)?.x).filter(x => x !== undefined);
+            if (parentXs.length === 0) continue;
+        
+            const x = parentXs.reduce((a, b) => a + b, 0) / parentXs.length;
+            const y = (generations.get(childName) ?? (parentLevel + 1)) * levelSpacing;
+            positions.set(childName, { x, y });
+          }
+        }
+        
+        // === Step 5: Build Cytoscape nodes with manual positions ===
+        for (const name of graph.keys()) {
+          const id = getId(name);
+          const { x, y } = positions.get(name) ?? { x: 0, y: 9999 };
+          nodes.set(id, {
+            group: "nodes",
+            data: { id, label: name },
+            position: { x, y }
+          });
         }
   
         // Build Cytoscape nodes
