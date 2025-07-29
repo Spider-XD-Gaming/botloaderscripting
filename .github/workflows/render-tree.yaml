@@ -3,7 +3,7 @@ name: Render Family Tree Image
 on:
   push:
     paths:
-      - 'docs/family.json'
+      - 'docs/data.json'
 
 jobs:
   render:
