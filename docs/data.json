@@ -5,5 +5,5 @@
   { "name": "soulin", "partners": [], "children": [] },
   { "name": "Spider", "partners": ["Kaixo", "Battlekaik5"], "children": ["soulin"] },
   { "name": "Kaixo", "partners": ["Spider"], "children": ["Pentura", "SC3N3CAT XD"] },
-  { "name": "Ieatkittensforlunch", "partners": ["SC3N3CAT XD"], "children": ["sage"] }
+  { "name": "Ieatkittensforlunch", "partners": ["SC3N3CAT XD"], "children": [] }
 ]
