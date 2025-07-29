@@ -1,0 +1,12 @@
+{
+  "name": "family-tree-renderer",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "npx serve .",
+    "render": "node render.js"
+  },
+  "dependencies": {
+    "puppeteer": "^21.0.0",
+    "serve": "^14.2.0"
+  }
+}
