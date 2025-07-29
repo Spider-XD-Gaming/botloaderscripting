@@ -104,7 +104,6 @@
             }
           }
         }
-        /*
         const positions = new Map(); // name → {x, y}
         const levelHeights = new Map(); // gen → current horizontal offset
         const nodeSpacing = 100;
@@ -137,29 +136,45 @@
             });
             levelHeights.set(level, (levelHeights.get(level) ?? 0) + all.length);
           }
-        }*/
-        // === Step 4: Position children centered below their parents ===
-        for (const [parentName, data] of graph.entries()) {
-          const parentPos = positions.get(parentName);
-          const parentLevel = generations.get(parentName);
+        }
         
-          for (const childName of data.children) {
-            if (positions.has(childName)) continue; // Already placed (e.g., has multiple parents)
+        for (const [name, level] of generations.entries()) {
+          if (!levelNodes.has(level)) levelNodes.set(level, []);
+          levelNodes.get(level).push(name);
+        }
         
-            // Find all parents of this child
-            const parents = [...graph.entries()]
-              .filter(([_, d]) => d.children.has(childName))
-              .map(([n]) => n);
-            const parentXs = parents.map(p => positions.get(p)?.x).filter(x => x !== undefined);
-            if (parentXs.length === 0) continue;
+        // Pass 1: layout each generation linearly (partners stay side-by-side)
+        for (const [level, names] of [...levelNodes.entries()].sort((a, b) => a[0] - b[0])) {
+          names.sort(); // alphabetical fallback
+          names.forEach((name, i) => {
+            const x = i * nodeSpacing;
+            const y = level * levelSpacing;
+            positions.set(name, { x, y });
+          });
+        }
         
-            const x = parentXs.reduce((a, b) => a + b, 0) / parentXs.length;
-            const y = (generations.get(childName) ?? (parentLevel + 1)) * levelSpacing;
-            positions.set(childName, { x, y });
+        // Pass 2: center children below their actual parents
+        for (const [childName, level] of generations.entries()) {
+          const childPos = positions.get(childName);
+          const childY = level * levelSpacing;
+        
+          const parents = [...graph.entries()]
+            .filter(([_, data]) => data.children.has(childName))
+            .map(([name]) => name);
+        
+          if (parents.length > 0) {
+            const parentXs = parents
+              .map(p => positions.get(p)?.x)
+              .filter(x => x !== undefined);
+        
+            if (parentXs.length > 0) {
+              const centerX = parentXs.reduce((a, b) => a + b, 0) / parentXs.length;
+              positions.set(childName, { x: centerX, y: childY });
+            }
           }
         }
         
-        // === Step 5: Build Cytoscape nodes with manual positions ===
+        // === Step 5: Build Cytoscape nodes with corrected positions ===
         for (const name of graph.keys()) {
           const id = getId(name);
           const { x, y } = positions.get(name) ?? { x: 0, y: 9999 };
@@ -169,7 +184,6 @@
             position: { x, y }
           });
         }
-  
         // Add edges
         for (const [name, data] of graph.entries()) {
           const sourceId = getId(name);
