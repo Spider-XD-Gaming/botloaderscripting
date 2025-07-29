@@ -13,7 +13,7 @@
   <script>
     const getId = name => name.replace(/\s+/g, "_");
   
-    fetch("family.json")
+    fetch("data.json")
       .then(res => res.json())
       .then(rawData => {
         const definedNames = new Set(rawData.map(p => p.name));
