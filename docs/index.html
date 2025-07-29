@@ -128,6 +128,7 @@
             }
           }
         }
+        const partnerClusters = getPartnerGroups(graph);
         // === Step 3: Fix child generations (strictly below all parents) ===
         let changedGen = true;
         while (changedGen) {
