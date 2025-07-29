@@ -154,23 +154,6 @@
           });
         }
   
-        // Build Cytoscape nodes
-        let xPositions = {}; // gen -> x offset
-        for (const name of graph.keys()) {
-          const id = getId(name);
-          const level = generations.get(name) ?? 99;
-          const x = (xPositions[level] ?? 0) * 150;
-          const y = level * 150;
-  
-          xPositions[level] = (xPositions[level] ?? 0) + 1;
-  
-          nodes.set(id, {
-            group: "nodes",
-            data: { id, label: name },
-            position: { x, y }
-          });
-        }
-  
         // Add edges
         for (const [name, data] of graph.entries()) {
           const sourceId = getId(name);
