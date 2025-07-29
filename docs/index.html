@@ -86,6 +86,40 @@
             }
           }
         }
+        // === Step 2b: Group connected partners into polycules ===
+        const partnerClusters = []; // Array of Sets
+        const partnerVisited = new Set();
+        
+        for (const name of graph.keys()) {
+          if (partnerVisited.has(name)) continue;
+        
+          const queue = [name];
+          const cluster = new Set();
+        
+          while (queue.length > 0) {
+            const curr = queue.pop();
+            if (partnerVisited.has(curr)) continue;
+            partnerVisited.add(curr);
+            cluster.add(curr);
+        
+            const data = graph.get(curr);
+            for (const partner of data.partners) {
+              if (!partnerVisited.has(partner)) queue.push(partner);
+            }
+          }
+        
+          if (cluster.size > 1) partnerClusters.push(cluster);
+        }
+        // === Step 2c: Equalize generation for all people in each polycule ===
+        for (const cluster of partnerClusters) {
+          let maxGen = 0;
+          for (const name of cluster) {
+            maxGen = Math.max(maxGen, generations.get(name) ?? 0);
+          }
+          for (const name of cluster) {
+            generations.set(name, maxGen);
+          }
+        }
         // === Step 3: Fix child generations (strictly below all parents) ===
         let changedGen = true;
         while (changedGen) {
@@ -145,13 +179,25 @@
         }
         
         // Pass 1: layout each generation linearly (partners stay side-by-side)
-        for (const [level, names] of [...levelNodes.entries()].sort((a, b) => a[0] - b[0])) {
-          names.sort(); // alphabetical fallback
-          names.forEach((name, i) => {
-            const x = i * nodeSpacing;
+        const laidOut = new Set();
+        let xOffset = 0;
+        
+        for (const name of names) {
+          if (laidOut.has(name)) continue;
+        
+          const cluster = partnerClusters.find(c => c.has(name));
+          const group = cluster ? [...cluster].filter(n => generations.get(n) === level) : [name];
+          group.sort(); // consistent order
+        
+          group.forEach((n, i) => {
+            const x = xOffset + i * nodeSpacing;
             const y = level * levelSpacing;
-            positions.set(name, { x, y });
+            positions.set(n, { x, y });
+            laidOut.add(n);
           });
+        
+          xOffset += group.length * nodeSpacing + nodeSpacing; // gap between groups
+        }
         }
         
         // Pass 2: center children below their actual parents
