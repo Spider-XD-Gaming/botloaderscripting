@@ -58,7 +58,7 @@
         while (queue.length > 0) {
           const { name, level } = queue.shift();
           if (generations.has(name)) {
-            generations.set(name, Math.max(generations.get(name), level));
+            generations.set(name, Math.min(generations.get(name), level));
           } else {
             generations.set(name, level);
           }
