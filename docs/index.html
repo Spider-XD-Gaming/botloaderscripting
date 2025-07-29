@@ -86,8 +86,25 @@
             }
           }
         }
+        // === Step 3: Fix child generations (strictly below all parents) ===
+        let changedGen = true;
+        while (changedGen) {
+          changedGen = false;
         
-        // === Step 3: Positioning ===
+          for (const [parentName, data] of graph.entries()) {
+            const parentLevel = generations.get(parentName);
+            for (const child of data.children) {
+              const childLevel = generations.get(child) ?? 0;
+              const requiredLevel = parentLevel + 1;
+        
+              if (childLevel < requiredLevel) {
+                generations.set(child, requiredLevel);
+                changedGen = true;
+              }
+            }
+          }
+        }
+        /*
         const positions = new Map(); // name → {x, y}
         const levelHeights = new Map(); // gen → current horizontal offset
         const nodeSpacing = 100;
@@ -120,25 +137,7 @@
             });
             levelHeights.set(level, (levelHeights.get(level) ?? 0) + all.length);
           }
-        }
-        // === Step 3: Fix child generations (strictly below all parents) ===
-        let changedGen = true;
-        while (changedGen) {
-          changedGen = false;
-        
-          for (const [parentName, data] of graph.entries()) {
-            const parentLevel = generations.get(parentName);
-            for (const child of data.children) {
-              const childLevel = generations.get(child) ?? 0;
-              const requiredLevel = parentLevel + 1;
-        
-              if (childLevel < requiredLevel) {
-                generations.set(child, requiredLevel);
-                changedGen = true;
-              }
-            }
-          }
-        }
+        }*/
         // === Step 4: Position children centered below their parents ===
         for (const [parentName, data] of graph.entries()) {
           const parentPos = positions.get(parentName);
