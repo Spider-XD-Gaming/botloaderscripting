@@ -73,18 +73,28 @@
             });
           }
         }
+
+        const childNames = new Set();
+        for (const person of rawData) {
+          person.children.forEach(c => childNames.add(c));
+        }
+        
+        const rootNames = rawData
+          .map(p => p.name)
+          .filter(name => !childNames.has(name));
+        
+        const rootIds = rootNames.map(getId);
   
         const cy = cytoscape({
           container: document.getElementById("cy"),
           elements: [...nodes.values(), ...edges],
           layout: {
+            name: "breadthfirst",
             directed: true,
             spacingFactor: 1.5,
-            animate: false,
-            roots: rawData
-              .filter(p => p.children.length)
-              .map(p => getId(p.name)),
-            orientation: "vertical"},
+            orientation: "vertical",
+            roots: rootIds
+          },
           style: [
             {
               selector: "node",
