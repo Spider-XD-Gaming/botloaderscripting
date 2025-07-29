@@ -13,15 +13,14 @@
   <script>
     const getId = name => name.replace(/\s+/g, "_");
   
-    fetch("data.json")
+    fetch("family.json")
       .then(res => res.json())
       .then(rawData => {
         const definedNames = new Set(rawData.map(p => p.name));
         const referencedNames = new Set();
-        const nodes = new Map(); // id -> node
+        const nodes = new Map();
         const edges = [];
   
-        // Add known people
         for (const person of rawData) {
           const id = getId(person.name);
           nodes.set(id, {
@@ -29,105 +28,114 @@
             data: { id, label: person.name, isPlaceholder: false }
           });
   
-          // Collect referenced names
           person.partners.forEach(name => referencedNames.add(name));
           person.children.forEach(name => referencedNames.add(name));
         }
   
-        // Add placeholder nodes for undefined referenced names
         for (const name of referencedNames) {
           if (!definedNames.has(name)) {
             const id = getId(name);
             if (!nodes.has(id)) {
               nodes.set(id, {
                 group: "nodes",
-                data: { id, label: name + " (unknown)", isPlaceholder: true }
+                data: { id, label: name, isPlaceholder: true }
               });
             }
           }
         }
   
-        // Now create edges
         for (const person of rawData) {
-          const sourceId = getId(person.name);
+          const parentId = getId(person.name);
   
           for (const partner of person.partners) {
-            const targetId = getId(partner);
-            const edgeId = [sourceId, targetId].sort().join("-");
+            const partnerId = getId(partner);
+            const edgeId = [parentId, partnerId].sort().join("-");
             edges.push({
               group: "edges",
-              data: { id: edgeId, source: sourceId, target: targetId, label: "partner" }
+              data: {
+                id: edgeId,
+                source: parentId,
+                target: partnerId,
+                relationship: "partner"
+              }
             });
           }
   
           for (const child of person.children) {
-            const targetId = getId(child);
+            const childId = getId(child);
             edges.push({
               group: "edges",
               data: {
-                id: sourceId + "->" + targetId,
-                source: sourceId,
-                target: targetId,
-                label: "child"
+                id: parentId + "->" + childId,
+                source: parentId,
+                target: childId,
+                relationship: "child"
               }
             });
           }
         }
-
+  
+        // Compute top-level ancestors (never appear as children)
+        const allNames = rawData.map(p => p.name);
         const childNames = new Set();
-        for (const person of rawData) {
-          person.children.forEach(c => childNames.add(c));
-        }
-        
-        const rootNames = rawData
-          .map(p => p.name)
-          .filter(name => !childNames.has(name));
-        
-        const rootIds = rootNames.map(getId);
+        rawData.forEach(p => p.children.forEach(c => childNames.add(c)));
+        const rootIds = allNames.filter(name => !childNames.has(name)).map(getId);
   
         const cy = cytoscape({
           container: document.getElementById("cy"),
           elements: [...nodes.values(), ...edges],
+          style: [
+            {
+              selector: "node",
+              style: {
+                label: "data(label)",
+                "background-color": "#0074D9",
+                "text-valign": "center",
+                "text-halign": "center",
+                "font-size": "12px",
+                color: "#fff",
+                width: 50,
+                height: 50
+              }
+            },
+            {
+              selector: "node[isPlaceholder = true]",
+              style: {
+                "background-color": "#888",
+                "font-style": "italic",
+                "text-opacity": 0.7
+              }
+            },
+            {
+              selector: "edge",
+              style: {
+                width: 2,
+                "curve-style": "bezier",
+                "target-arrow-shape": "none"
+              }
+            },
+            {
+              selector: "edge[relationship = 'partner']",
+              style: {
+                "line-style": "dashed",
+                "line-color": "#FF851B"
+              }
+            },
+            {
+              selector: "edge[relationship = 'child']",
+              style: {
+                "line-style": "solid",
+                "line-color": "#888"
+              }
+            }
+          ],
           layout: {
             name: "breadthfirst",
             directed: true,
             spacingFactor: 1.5,
             orientation: "vertical",
             roots: rootIds
-          },
-          style: [
-            {
-              selector: "node",
-              style: {
-                "background-color": "#4f91ff",
-                "label": "data(label)",
-                "color": "#fff",
-                "text-valign": "center",
-                "text-halign": "center",
-                "text-outline-color": "#000",
-                "text-outline-width": 2,
-                "font-size": "12px",
-                "width": "label",
-                "height": "label",
-                "padding": "8px"
-              }
-            },
-            {
-              selector: "edge",
-              style: {
-                "width": 2,
-                "line-color": "#aaa",
-                "target-arrow-color": "#aaa",
-                "target-arrow-shape": "triangle",
-                "curve-style": "bezier",
-                "label": "data(label)",
-                "font-size": "10px",
-                "color": "#ccc",
-                "text-rotation": "autorotate",
-                "text-margin-y": -5
-              }
-            }
-          ]
+          }
         });
       });
   </script>
