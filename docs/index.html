@@ -76,7 +76,7 @@
   
         const cy = cytoscape({
       container: document.getElementById("cy"),
-      elements,
+      elements: [...nodes.values(), ...edges],
       layout: {name: "breadthfirst"},
       style: [
         {
