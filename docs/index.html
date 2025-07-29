@@ -150,7 +150,7 @@
         const positions = new Map(); // name → {x, y}
         const levelHeights = new Map(); // gen → current horizontal offset
         const levelNodes = new Map(); // level -> list of names
-        const nodeSpacing = 100;
+        const nodeSpacing = 120;
         const levelSpacing = 150;
         
         // Helper to group partners together and avoid overlap
@@ -340,7 +340,7 @@
           layout: {
             name: "preset", // ← we manually set x/y for top-down
             fit: true,
-            padding: 75
+            padding: 50
           }
         });
         window.cy = cy;
