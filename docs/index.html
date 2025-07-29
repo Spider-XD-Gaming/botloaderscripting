@@ -39,22 +39,12 @@
           }
         }
   
-        // Compute generations
-        const generations = new Map(); // name -> level
+        // Step 1: Assign generations based on parent-child relationships only
+        const generations = new Map();
         const visited = new Set();
-  
-        // Find root people (no one lists them as children)
-        const allNames = Array.from(graph.keys());
-        const allChildren = new Set();
-        for (const [_, data] of graph) {
-          for (const child of data.children) {
-            allChildren.add(child);
-          }
-        }
-        const roots = allNames.filter(n => !allChildren.has(n));
-  
+        
         const queue = roots.map(name => ({ name, level: 0 }));
-  
+        
         while (queue.length > 0) {
           const { name, level } = queue.shift();
           if (generations.has(name)) {
@@ -63,16 +53,30 @@
             generations.set(name, level);
           }
           visited.add(name);
-  
+        
           const data = graph.get(name);
-          for (const partner of data.partners) {
-            if (!generations.has(partner)) {
-              queue.push({ name: partner, level });
-            }
-          }
           for (const child of data.children) {
             if (!generations.has(child)) {
               queue.push({ name: child, level: level + 1 });
+            }
+          }
+        }
+        
+        // Step 2: Pull partners down to the max of any connected partner
+        let changed = true;
+        while (changed) {
+          changed = false;
+          for (const [name, data] of graph.entries()) {
+            const level = generations.get(name);
+            for (const partner of data.partners) {
+              const partnerLevel = generations.get(partner);
+              if (partnerLevel !== undefined && partnerLevel < level) {
+                generations.set(partner, level);
+                changed = true;
+              } else if (partnerLevel === undefined) {
+                generations.set(partner, level);
+                changed = true;
+              }
             }
           }
         }
