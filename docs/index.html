@@ -179,24 +179,27 @@
         }
         
         // Pass 1: layout each generation linearly (partners stay side-by-side)
-        const laidOut = new Set();
-        let xOffset = 0;
-        
-        for (const name of names) {
-          if (laidOut.has(name)) continue;
-        
-          const cluster = partnerClusters.find(c => c.has(name));
-          const group = cluster ? [...cluster].filter(n => generations.get(n) === level) : [name];
-          group.sort(); // consistent order
-        
-          group.forEach((n, i) => {
-            const x = xOffset + i * nodeSpacing;
-            const y = level * levelSpacing;
-            positions.set(n, { x, y });
-            laidOut.add(n);
-          });
-        
-          xOffset += group.length * nodeSpacing + nodeSpacing; // gap between groups
+        for (const [level, names] of [...levelNodes.entries()].sort((a, b) => a[0] - b[0])) {
+          names.sort(); // alphabetical fallback
+          const laidOut = new Set();
+          let xOffset = 0;
+          
+          for (const name of names) {
+            if (laidOut.has(name)) continue;
+          
+            const cluster = partnerClusters.find(c => c.has(name));
+            const group = cluster ? [...cluster].filter(n => generations.get(n) === level) : [name];
+            group.sort(); // consistent order
+          
+            group.forEach((n, i) => {
+              const x = xOffset + i * nodeSpacing;
+              const y = level * levelSpacing;
+              positions.set(n, { x, y });
+              laidOut.add(n);
+            });
+          
+            xOffset += group.length * nodeSpacing + nodeSpacing; // gap between groups
+          }
         }
         
         // Pass 2: center children below their actual parents
