@@ -8,7 +8,7 @@ const puppeteer = require("puppeteer");
   const page = await browser.newPage();
   await page.setViewport({ width: 1200, height: 800 });
 
-  await page.goto("file://" + __dirname + "/index.html", { waitUntil: "networkidle0" });
+  await page.goto("file://" + __dirname + "/docs/index.html", { waitUntil: "networkidle0" });
 
   // Wait for cytoscape to finish rendering
   await page.waitForSelector("#cy");
