@@ -12,58 +12,91 @@
   <div id="cy"></div>
   <script>
     const getId = name => name.replace(/\s+/g, "_");
-
-    fetch("data.json")
+  
+    fetch("family.json")
       .then(res => res.json())
       .then(rawData => {
-        const nodes = new Set();
+        const definedNames = new Set(rawData.map(p => p.name));
+        const referencedNames = new Set();
+        const nodes = new Map(); // id -> node
         const edges = [];
-
+  
+        // Add known people
         for (const person of rawData) {
           const id = getId(person.name);
-          nodes.add(id);
+          nodes.set(id, {
+            group: "nodes",
+            data: { id, label: person.name, isPlaceholder: false }
+          });
+  
+          // Collect referenced names
+          person.partners.forEach(name => referencedNames.add(name));
+          person.children.forEach(name => referencedNames.add(name));
         }
-
+  
+        // Add placeholder nodes for undefined referenced names
+        for (const name of referencedNames) {
+          if (!definedNames.has(name)) {
+            const id = getId(name);
+            if (!nodes.has(id)) {
+              nodes.set(id, {
+                group: "nodes",
+                data: { id, label: name + " (unknown)", isPlaceholder: true }
+              });
+            }
+          }
+        }
+  
+        // Now create edges
         for (const person of rawData) {
-          const parentId = getId(person.name);
-
+          const sourceId = getId(person.name);
+  
           for (const partner of person.partners) {
-            const partnerId = getId(partner);
-            const edgeId = [parentId, partnerId].sort().join("-");
+            const targetId = getId(partner);
+            const edgeId = [sourceId, targetId].sort().join("-");
             edges.push({
               group: "edges",
-              data: { id: edgeId, source: parentId, target: partnerId, label: "partner" }
+              data: { id: edgeId, source: sourceId, target: targetId, label: "partner" }
             });
           }
-
+  
           for (const child of person.children) {
-            const childId = getId(child);
+            const targetId = getId(child);
             edges.push({
               group: "edges",
-              data: { id: parentId + "->" + childId, source: parentId, target: childId, label: "child" }
+              data: {
+                id: sourceId + "->" + targetId,
+                source: sourceId,
+                target: targetId,
+                label: "child"
+              }
             });
           }
         }
-
-        const elements = Array.from(nodes).map(id => ({
-          group: "nodes", data: { id }
-        })).concat(edges);
-
-        cytoscape({
+  
+        const cy = cytoscape({
           container: document.getElementById("cy"),
-          elements,
+          elements: [...nodes.values(), ...edges],
           style: [
             {
               selector: "node",
               style: {
-                label: "data(id)",
+                label: "data(label)",
                 "background-color": "#0074D9",
-                color: "#fff",
                 "text-valign": "center",
                 "text-halign": "center",
                 "font-size": "12px",
-                "width": 50,
-                "height": 50
+                color: "#fff",
+                width: 50,
+                height: 50
+              }
+            },
+            {
+              selector: "node[isPlaceholder = true]",
+              style: {
+                "background-color": "#aaa",
+                "font-style": "italic",
+                "text-opacity": 0.7
               }
             },
             {
