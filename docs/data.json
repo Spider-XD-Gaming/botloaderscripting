@@ -1,9 +1,9 @@
 [
-  { "name": "reub00_", "partners": [], "children": ["Spider"] },
-  { "name": "SC3N3CAT XD", "partners": ["Ieatkittensforlunch"], "children": ["ahhhhhhhhhhhhhhhhhhhhhh19", "Pluto"] },
+  { "name": "í µí³¬í µí³²í µí³¶í µí³ªí µí³·í µí³²í µí³¶", "partners": [], "children": ["Spider"] },
+  { "name": "SC3N3CAT XD", "partners": ["Ieatkittensforlunch"], "children": ["Art Muncher âœ¨", "Pluto"] },
   { "name": "Battlekaik5", "partners": ["Spider"], "children": [] },
   { "name": "Spider", "partners": ["Kaixo", "Battlekaik5"], "children": ["Cambrian Waterbug", "soulin"] },
-  { "name": "Kaixo", "partners": ["Spider"], "children": ["Pentura", "V10l3t <3", "SC3N3CAT XD", "DEATH OF DANGER NOODLES"] },
+  { "name": "Kaixo", "partners": ["Spider"], "children": ["V10l3t <3", "SC3N3CAT XD", "Pentura", "DEATH OF DANGER NOODLES"] },
   { "name": "Madosa", "partners": [], "children": ["Ieatkittensforlunch"] },
   { "name": "Ieatkittensforlunch", "partners": ["SC3N3CAT XD"], "children": ["sage"] }
 ]
