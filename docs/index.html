@@ -86,38 +86,46 @@
             }
           }
         }
-        // === Step 2b: Group connected partners into polycules ===
-        const partnerClusters = []; // Array of Sets
-        const partnerVisited = new Set();
+        // === Step 2.5: Fully unify generations of all connected partners ===
+        function getPartnerGroups(graph) {
+          const groups = [];
+          const visited = new Set();
         
-        for (const name of graph.keys()) {
-          if (partnerVisited.has(name)) continue;
+          for (const name of graph.keys()) {
+            if (visited.has(name)) continue;
+            const queue = [name];
+            const group = new Set();
         
-          const queue = [name];
-          const cluster = new Set();
+            while (queue.length > 0) {
+              const current = queue.pop();
+              if (visited.has(current)) continue;
+              visited.add(current);
+              group.add(current);
         
-          while (queue.length > 0) {
-            const curr = queue.pop();
-            if (partnerVisited.has(curr)) continue;
-            partnerVisited.add(curr);
-            cluster.add(curr);
-        
-            const data = graph.get(curr);
-            for (const partner of data.partners) {
-              if (!partnerVisited.has(partner)) queue.push(partner);
+              for (const partner of graph.get(current).partners) {
+                queue.push(partner);
+              }
             }
+        
+            if (group.size > 1) groups.push(group);
           }
         
-          if (cluster.size > 1) partnerClusters.push(cluster);
+          return groups;
         }
-        // === Step 2c: Equalize generation for all people in each polycule ===
-        for (const cluster of partnerClusters) {
-          let maxGen = 0;
-          for (const name of cluster) {
-            maxGen = Math.max(maxGen, generations.get(name) ?? 0);
-          }
-          for (const name of cluster) {
-            generations.set(name, maxGen);
+        
+        let genChanged = true;
+        while (genChanged) {
+          genChanged = false;
+          const groups = getPartnerGroups(graph);
+        
+          for (const group of groups) {
+            const maxGen = Math.max(...[...group].map(n => generations.get(n) ?? 0));
+            for (const name of group) {
+              if (generations.get(name) !== maxGen) {
+                generations.set(name, maxGen);
+                genChanged = true;
+              }
+            }
           }
         }
         // === Step 3: Fix child generations (strictly below all parents) ===
