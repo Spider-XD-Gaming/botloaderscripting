@@ -20,12 +20,13 @@
         const referencedNames = new Set();
         const nodes = new Map();
         const edges = [];
+        const graph = new Map(); // name -> { partners, children }
   
+        // Build raw graph
         for (const person of rawData) {
-          const id = getId(person.name);
-          nodes.set(id, {
-            group: "nodes",
-            data: { id, label: person.name, isPlaceholder: false }
+          graph.set(person.name, {
+            partners: new Set(person.partners),
+            children: new Set(person.children)
           });
   
           person.partners.forEach(name => referencedNames.add(name));
@@ -34,52 +35,94 @@
   
         for (const name of referencedNames) {
           if (!definedNames.has(name)) {
-            const id = getId(name);
-            if (!nodes.has(id)) {
-              nodes.set(id, {
-                group: "nodes",
-                data: { id, label: name, isPlaceholder: true }
-              });
+            graph.set(name, { partners: new Set(), children: new Set() });
+          }
+        }
+  
+        // Compute generations
+        const generations = new Map(); // name -> level
+        const visited = new Set();
+  
+        // Find root people (no one lists them as children)
+        const allNames = Array.from(graph.keys());
+        const allChildren = new Set();
+        for (const [_, data] of graph) {
+          for (const child of data.children) {
+            allChildren.add(child);
+          }
+        }
+        const roots = allNames.filter(n => !allChildren.has(n));
+  
+        const queue = roots.map(name => ({ name, level: 0 }));
+  
+        while (queue.length > 0) {
+          const { name, level } = queue.shift();
+          if (generations.has(name)) {
+            generations.set(name, Math.min(generations.get(name), level));
+          } else {
+            generations.set(name, level);
+          }
+          visited.add(name);
+  
+          const data = graph.get(name);
+          for (const partner of data.partners) {
+            if (!generations.has(partner)) {
+              queue.push({ name: partner, level });
+            }
+          }
+          for (const child of data.children) {
+            if (!generations.has(child)) {
+              queue.push({ name: child, level: level + 1 });
             }
           }
         }
   
-        for (const person of rawData) {
-          const parentId = getId(person.name);
+        // Build Cytoscape nodes
+        let xPositions = {}; // gen -> x offset
+        for (const name of graph.keys()) {
+          const id = getId(name);
+          const level = generations.get(name) ?? 99;
+          const x = (xPositions[level] ?? 0) * 150;
+          const y = level * 150;
   
-          for (const partner of person.partners) {
-            const partnerId = getId(partner);
-            const edgeId = [parentId, partnerId].sort().join("-");
+          xPositions[level] = (xPositions[level] ?? 0) + 1;
+  
+          nodes.set(id, {
+            group: "nodes",
+            data: { id, label: name },
+            position: { x, y }
+          });
+        }
+  
+        // Add edges
+        for (const [name, data] of graph.entries()) {
+          const sourceId = getId(name);
+          for (const partner of data.partners) {
+            const targetId = getId(partner);
+            const edgeId = [sourceId, targetId].sort().join("-");
             edges.push({
               group: "edges",
               data: {
                 id: edgeId,
-                source: parentId,
-                target: partnerId,
+                source: sourceId,
+                target: targetId,
                 relationship: "partner"
               }
             });
           }
-  
-          for (const child of person.children) {
-            const childId = getId(child);
+          for (const child of data.children) {
+            const targetId = getId(child);
             edges.push({
               group: "edges",
               data: {
-                id: parentId + "->" + childId,
-                source: parentId,
-                target: childId,
+                id: sourceId + "->" + targetId,
+                source: sourceId,
+                target: targetId,
                 relationship: "child"
               }
             });
           }
         }
-  
-        // Compute top-level ancestors (never appear as children)
-        const allNames = rawData.map(p => p.name);
-        const childNames = new Set();
-        rawData.forEach(p => p.children.forEach(c => childNames.add(c)));
-        const rootIds = allNames.filter(name => !childNames.has(name)).map(getId);
   
         const cy = cytoscape({
           container: document.getElementById("cy"),
@@ -96,14 +139,6 @@
                 color: "#fff",
                 width: 50,
                 height: 50
-              }
-            },
-            {
-              selector: "node[isPlaceholder = true]",
-              style: {
-                "background-color": "#888",
-                "font-style": "italic",
-                "text-opacity": 0.7
               }
             },
             {
@@ -130,11 +165,9 @@
             }
           ],
           layout: {
-            name: "breadthfirst",
-            directed: true,
-            spacingFactor: 1.5,
-            orientation: "vertical",
-            roots: rootIds
+            name: "preset", // ← we manually set x/y for top-down
+            fit: true,
+            padding: 50
           }
         });
       });
