@@ -3,7 +3,7 @@
   { "name": "SC3N3CAT XD", "partners": ["Ieatkittensforlunch"], "children": ["Art Muncher ✨", "Pluto"] },
   { "name": "Battlekaik5", "partners": ["Spider"], "children": [] },
   { "name": "Spider", "partners": ["Kaixo", "Battlekaik5"], "children": ["Cambrian Waterbug", "soulin"] },
-  { "name": "Kaixo", "partners": ["Spider"], "children": ["DEATH OF DANGER NOODLES", "V10l3t <3", "SC3N3CAT XD", "Pentura"] },
+  { "name": "Kaixo", "partners": ["Spider"], "children": ["SC3N3CAT XD", "V10l3t <3", "DEATH OF DANGER NOODLES", "Pentura"] },
   { "name": "Madosa", "partners": [], "children": ["Ieatkittensforlunch"] },
   { "name": "Ieatkittensforlunch", "partners": ["SC3N3CAT XD"], "children": ["sage"] }
 ]
