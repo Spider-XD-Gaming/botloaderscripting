@@ -1,5 +1,5 @@
 [
-  { "name": "reub00_", "partners": [], "children": ["Spider"] },
+  { "name": "reub00", "partners": [], "children": ["Spider"] },
   { "name": "SC3N3CAT XD", "partners": ["Ieatkittensforlunch"], "children": ["Art Muncher ✨", "Pluto"] },
   { "name": "Battlekaik5", "partners": ["Spider"], "children": [] },
   { "name": "Spider", "partners": ["Kaixo", "Battlekaik5"], "children": ["Cambrian Waterbug", "soulin"] },
