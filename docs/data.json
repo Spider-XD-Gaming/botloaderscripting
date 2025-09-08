@@ -1,9 +1,11 @@
 [
   { "name": "reub00_", "partners": [], "children": ["Spider"] },
   { "name": "SC3N3CAT XD", "partners": ["Ieatkittensforlunch"], "children": ["Art Muncher ✨", "Pluto"] },
+  { "name": "Cambrian Waterbug", "partners": ["BlueBerri"], "children": [] },
+  { "name": "BlueBerri", "partners": ["Cambrian Waterbug"], "children": [] },
   { "name": "Battlekaik5", "partners": ["Spider"], "children": [] },
-  { "name": "Spider", "partners": ["Battlekaik5", "Kaixo"], "children": ["Cambrian Waterbug", "soulin"] },
-  { "name": "Kaixo", "partners": ["Spider"], "children": ["DEATH OF DANGER NOODLES", "Pentura", "SC3N3CAT XD", "V10l3t <3"] },
+  { "name": "Spider", "partners": ["Kaixo", "Battlekaik5"], "children": ["Cambrian Waterbug", "soulin"] },
+  { "name": "Kaixo", "partners": ["Spider"], "children": ["Pentura", "DEATH OF DANGER NOODLES", "SC3N3CAT XD", "V10l3t <3"] },
   { "name": "Madosa", "partners": [], "children": ["Ieatkittensforlunch"] },
-  { "name": "Ieatkittensforlunch", "partners": ["SC3N3CAT XD"], "children": ["sage"] }
+  { "name": "Ieatkittensforlunch", "partners": ["SC3N3CAT XD"], "children": [] }
 ]
