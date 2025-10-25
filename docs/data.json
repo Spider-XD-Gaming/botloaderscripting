@@ -1,13 +1,13 @@
 [
   { "name": "reub00_", "partners": [], "children": ["Spider"] },
-  { "name": "SC3N3CAT XD", "partners": ["Ieatkittensforlunch"], "children": [] },
+  { "name": "SC3N3CAT XD", "partners": ["Ieatkittensforlunch"], "children": ["Pluto"] },
   { "name": "Pluto", "partners": [], "children": [] },
   { "name": "Cambrian Waterbug", "partners": ["BlueBerri"], "children": [] },
   { "name": "BlueBerri", "partners": ["Cambrian Waterbug"], "children": [] },
   { "name": "Battlekaik5", "partners": ["Spider"], "children": [] },
   { "name": "GaryTheManwhore", "partners": ["Madosa"], "children": [] },
-  { "name": "Spider", "partners": ["Kaixo", "Battlekaik5"], "children": ["soulin", "Cambrian Waterbug"] },
-  { "name": "Kaixo", "partners": ["Spider"], "children": ["DEATH OF DANGER NOODLES", "V10l3t <3", "Pentura", "SC3N3CAT XD"] },
+  { "name": "Spider", "partners": ["Kaixo", "Battlekaik5"], "children": ["Cambrian Waterbug", "soulin"] },
+  { "name": "Kaixo", "partners": ["Spider"], "children": ["SC3N3CAT XD", "V10l3t <3", "DEATH OF DANGER NOODLES", "Pentura Holloway"] },
   { "name": "Madosa", "partners": ["GaryTheManwhore"], "children": ["Ieatkittensforlunch"] },
-  { "name": "Ieatkittensforlunch", "partners": ["SC3N3CAT XD"], "children": ["sage"] }
+  { "name": "Ieatkittensforlunch", "partners": ["SC3N3CAT XD"], "children": [] }
 ]
