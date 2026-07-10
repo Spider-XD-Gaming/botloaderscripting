@@ -8,5 +8,5 @@
   { "name": "GaryTheManwhore", "partners": [], "children": [] },
   { "name": "shrimptoasty", "partners": [], "children": ["Spider"] },
   { "name": "Spider", "partners": ["Battlekaik5"], "children": ["Cambrian Waterbug", "joulin"] },
-  { "name": "Kedamono", "partners": ["POPEE •*¨*•.¸¸☆*"], "children": [] }
+  { "name": "Kedamono", "partners": ["POPEE •*¨*•.¸¸☆*"], "children": ["sage"] }
 ]
