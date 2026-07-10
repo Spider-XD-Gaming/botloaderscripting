@@ -7,6 +7,6 @@
   { "name": "Battlekaik5", "partners": ["Spider"], "children": [] },
   { "name": "GaryTheManwhore", "partners": [], "children": [] },
   { "name": "shrimptoasty", "partners": [], "children": ["Spider"] },
-  { "name": "Spider", "partners": ["Battlekaik5"], "children": ["joulin", "Cambrian Waterbug"] },
-  { "name": "Kedamono", "partners": ["POPEE •*¨*•.¸¸☆*"], "children": ["sage"] }
+  { "name": "Spider", "partners": ["Battlekaik5"], "children": ["Cambrian Waterbug", "joulin"] },
+  { "name": "Kedamono", "partners": ["POPEE •*¨*•.¸¸☆*"], "children": [] }
 ]
