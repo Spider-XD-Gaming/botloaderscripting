@@ -1,13 +1,13 @@
 [
   { "name": "cimanim", "partners": [], "children": ["Spider"] },
-  { "name": "POPEE •*¨*•.¸¸☆*", "partners": ["Kedamono"], "children": ["Pluto"] },
+  { "name": "Khennistry (blue Crystals)", "partners": ["Fentakenta User"], "children": ["Pluto"] },
   { "name": "Pluto", "partners": [], "children": [] },
   { "name": "Cambrian Waterbug", "partners": ["blueberri0274"], "children": [] },
   { "name": "blueberri0274", "partners": ["Cambrian Waterbug"], "children": [] },
   { "name": "Battlekaik5", "partners": ["Spider"], "children": [] },
   { "name": "GaryTheManwhore", "partners": [], "children": [] },
-  { "name": "shrimptoasty", "partners": [], "children": ["Spider"] },
-  { "name": "joulin", "partners": [], "children": [] },
-  { "name": "Spider", "partners": ["Battlekaik5"], "children": ["joulin", "Cambrian Waterbug"] },
-  { "name": "Kedamono", "partners": ["POPEE •*¨*•.¸¸☆*"], "children": ["sage"] }
+  { "name": "ALYX..... ok", "partners": [], "children": ["Spider"] },
+  { "name": "soulin?", "partners": [], "children": [] },
+  { "name": "Spider", "partners": ["Battlekaik5"], "children": ["soulin?", "Cambrian Waterbug"] },
+  { "name": "Fentakenta User", "partners": [], "children": [] }
 ]
